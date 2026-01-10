@@ -1,5 +1,6 @@
 from django.db import models
 
+
 # Create your models here.
 class Cliente(models.Model):
     cpf = models.CharField(max_length=11, unique=True)
@@ -12,6 +13,9 @@ class Cliente(models.Model):
     )
     data_cadastro = models.DateTimeField(auto_now_add=True, blank=True)
 
+    def __str__(self):
+        return f"{self.nome} {self.sobrenome}"
+
 
 class Endereco(models.Model):
     cep = models.CharField(max_length=8)
@@ -21,8 +25,14 @@ class Endereco(models.Model):
     numero = models.IntegerField()
     apartamento = models.CharField(max_length=10, null=True, blank=True)
 
+    def __str__(self):
+        eh_apartamento = self.apartamento if self.apartamento else ""
+        if eh_apartamento:
+            return f"Cep: {self.cep} | Num: {self.numero} | Apt: {self.apartamento} "
+        return f"Cep: {self.cep} | Num: {self.numero} "
 
-class Calendario(models.Model):
+
+class Agendamento(models.Model):
     data = models.DateField()
     horario_inicio = models.TimeField()
     horario_fim = models.TimeField()
@@ -43,7 +53,7 @@ class Calendario(models.Model):
             informacao_bloqueo = (
                 self.descricao if self.descricao else "Sem Informações."
             )
-            return f"Bloqueado: {informacao_bloqueo}"
+            return f"{self.data} | {self.horario_inicio}-{self.horario_fim}: Sem agendamento - {informacao_bloqueo}"
         nome_cliente = self.cliente.nome if self.cliente else "Anônimo"
         nome_procedimento = (
             self.procedimento.nome if self.procedimento else "Não definido"
@@ -56,3 +66,6 @@ class Calendario(models.Model):
 class Procedimento(models.Model):
     nome = models.CharField(max_length=50)
     valor = models.DecimalField(max_digits=6, decimal_places=2)
+
+    def __str__(self):
+        return self.nome

@@ -31,6 +31,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    # "jazzmin",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -99,11 +100,41 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+# JAZZMIN_SETTINGS = {
+#     "site_title": "Agendamento System",
+#     "site_header": "Agendamento",
+#     "site_brand": "Minha Clínica/Loja",
+#     "welcome_sign": "Bem-vindo ao Sistema de Agendamentos",
+#     "copyright": "Leandro Galbarino Ltd",
+#     "search_model": [
+#         "agendamento.Cliente",
+#         "agendamento.Agendamento",
+#         "agendamento.Endereco",
+#         "agendamento.Procedimento",
+#     ],
+#     "icons": {
+#         "auth": "fas fa-users-cog",
+#         "auth.user": "fas fa-user",
+#         "agendamento.Cliente": "fas fa-address-book",
+#         "agendamento.Endereco": "fas fa-map-marker-alt",
+#         "agendamento.Agendamento": "fas fa-calendar-alt",
+#         "agendamento.Procedimento": "fas fa-concierge-bell",
+#     },
+#     # Ícones para os modelos que não foram definidos acima
+#     "default_icon_parents": "fas fa-chevron-circle-right",
+#     "default_icon_children": "fas fa-circle",
+# }
+
+# # Personalização Visual (Temas)
+# JAZZMIN_UI_TWEAKS = {
+#     "theme": "flatly",  # Um tema limpo e profissional
+#     "dark_mode_theme": "darkly",  # Opção de tema escuro
+# }
 
 # Internationalization
 # https://docs.djangoproject.com/en/6.0/topics/i18n/
 
-LANGUAGE_CODE = "en-us"
+LANGUAGE_CODE = "pt-br"
 
 TIME_ZONE = "America/Sao_Paulo"
 
