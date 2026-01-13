@@ -9,8 +9,19 @@
     {% if lista_clientes %}
       <ul>
       {% for cliente in lista_clientes %}
-          <li><a href="/agendamento/{{ cliente.id }}/">{{ cliente.nome }}</a></li>
-      {% endfor %}
+          <li><a href="{% url "agendamento:cliente_pagina" cliente.id %}">{{ cliente.nome }}</a></li>
+          <form action="{% url 'agendamento:vote' cliente.id %}" method="post">
+            {% csrf_token %}
+            <fieldset>
+                <legend><h1>{{ cliente.nome }} </h1></legend>
+                {% if error_message %} <p>{{ error_message }}</p> {% endif %}
+                {% for choice in lista %}
+                <input type="radio" name="choice" id="choice{{ forloop.counter }}" value="20"/>
+                {% endfor %}
+            </fieldset>
+            <input type="submit" value="vote">  
+            </form>
+          {% endfor %}
       </ul>
       {% else %}
           <p>No polls are available.</p>

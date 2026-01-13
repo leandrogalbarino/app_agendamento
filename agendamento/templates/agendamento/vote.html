@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+    {% if cliente %}
+      <div>
+        <label>Nome:</label>
+        <span>{{ cliente.nome }} {{ cliente.sobrenome }}</span>
+      </div>
+      <div>
+        <label>Email:</label>
+        <span>{{ cliente.email }}</span>
+      </div>
+      <div>
+        <label>Telefone:</label>
+        <span>{{ cliente.telefone }}</span>
+      </div>
+      <div>
+        <label>Endereço:</label>
+        <span>{{ cliente.endereco.cidade }}
+          {{ cliente.endereco.bairro}} {{ cliente.endereco.rua}}
+          {{ cliente.endereco.num}}
+          {% if cliente.endereco.apartamento %}
+            {{ cliente.endereco.apartamento }}
+          {% endif %}
+        </span>
+      </div> 
+    {% endif %}
+</body>
+</html>

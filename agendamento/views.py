@@ -1,8 +1,8 @@
-from django.http import JsonResponse, HttpResponse, Http404
+from django.http import JsonResponse, HttpResponse, HttpResponseRedirect, Http404
 from django.template import loader
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from .models import Cliente
-
+from django.urls import reverse
 
 # Create your views here.
 # json
@@ -26,16 +26,19 @@ from .models import Cliente
 
 def index(request):
     lista_clientes = Cliente.objects.order_by("-data_cadastro")
-
-    context = {"lista_clientes": lista_clientes}
+    list = [
+        {"id": 1},
+        {"id": 2},
+        {"id": 3},
+        {"id": 4},
+        {"id": 5},
+    ]
+    context = {"lista_clientes": lista_clientes, "lista": list}
     return render(request, "agendamento/index.html", context)
 
 
-def detail(request, cliente_id):
-    try:
-        cliente = Cliente.objects.get(pk=cliente_id)
-    except Cliente.DoesNotExist:
-        raise Http404(f"Cliente com id: {cliente_id} não existe.")
+def cliente_pag(request, cliente_id):
+    cliente = get_object_or_404(Cliente, pk=cliente_id)
     return render(request, "agendamento/pagina_unica.html", {"cliente": cliente})
 
 
@@ -45,4 +48,16 @@ def results(request, cliente_id):
 
 
 def vote(request, cliente_id):
-    return HttpResponse("You're voting on question %s." % cliente_id)
+    try:
+        cliente = Cliente.objects.get(pk=cliente_id)
+    except Cliente.DoesNotExist:
+        return render(
+            request,
+            "agendamento/index.html",
+            {
+                "error_message": "You didn't select a choice.",
+            },
+        )
+    message = f"O cliente {cliente.nome} votou na opção {request.POST["choice"]}"
+    return HttpResponse(message)
+    # return HttpResponseRedirect(reverse("agendamento:resultados", args=(cliente.id,)))
