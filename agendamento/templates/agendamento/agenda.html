@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Agendamento</title>
+</head>
+<body>
+  <div>
+    <p>Agendamentos para hoje:</p>
+    {% for item in agenda %}
+      <div>
+        <div><a href="{% url 'agendamento:pagina_unica' item.id %}">{{ item }}</a></div>
+      </div>  
+        {% empty %}
+        <p>Não há agendamentos para hoje!</p>
+    {% endfor %}
+  </div>
+</body>
+</html>

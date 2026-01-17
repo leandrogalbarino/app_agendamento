@@ -59,7 +59,7 @@ class Agendamento(models.Model):
             self.procedimento.nome if self.procedimento else "Não definido"
         )
         return (
-            f"{self.data} | {self.horario_inicio}: {nome_cliente} - {nome_procedimento}"
+            f"{self.data} | {self.horario_inicio}-{self.horario_fim}: {nome_cliente} - {nome_procedimento}"
         )
 
 

@@ -6,29 +6,22 @@
   <title>Document</title>
 </head>
 <body>
-    {% if cliente %}
+    <div>
       <div>
-        <label>Nome:</label>
-        <span>{{ cliente.nome }} {{ cliente.sobrenome }}</span>
+        <span>{{ reserva.cliente }}</span>
       </div>
       <div>
-        <label>Email:</label>
-        <span>{{ cliente.email }}</span>
+        <span>{{ reserva.procedimento }}</span>
       </div>
       <div>
-        <label>Telefone:</label>
-        <span>{{ cliente.telefone }}</span>
+        <span>Inicio: {{ reserva.horario_inicio }}</span>
       </div>
       <div>
-        <label>Endereço:</label>
-        <span>{{ cliente.endereco.cidade }}
-          {{ cliente.endereco.bairro}} {{ cliente.endereco.rua}}
-          {{ cliente.endereco.num}}
-          {% if cliente.endereco.apartamento %}
-            {{ cliente.endereco.apartamento }}
-          {% endif %}
-        </span>
-      </div> 
-    {% endif %}
-</body>
+        <span>Fim: {{ reserva.horario_fim }}</span>
+      </div>
+      <div>
+        <span>Valor cobrado: {{ reserva.valor_pago }}</span>
+      </div>
+    </div>
+<body/>
 </html>

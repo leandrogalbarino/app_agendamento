@@ -1,8 +1,9 @@
 from django.http import JsonResponse, HttpResponse, HttpResponseRedirect, Http404
 from django.template import loader
 from django.shortcuts import render, get_object_or_404
-from .models import Cliente
+from .models import Cliente, Agendamento
 from django.urls import reverse
+from datetime import datetime
 
 # Create your views here.
 # json
@@ -60,4 +61,13 @@ def vote(request, cliente_id):
         )
     message = f"O cliente {cliente.nome} votou na opção {request.POST["choice"]}"
     return HttpResponse(message)
-    # return HttpResponseRedirect(reverse("agendamento:resultados", args=(cliente.id,)))
+
+
+def agenda(request):
+    agenda = Agendamento.objects.filter(data=datetime.now()).order_by("horario_inicio")
+    return render(request, "agendamento/agenda.html", {"agenda": agenda})
+
+
+def reserva(request, agendamento_id):
+    horario = get_object_or_404(Agendamento, pk=agendamento_id)
+    return render(request, "agendamento/pagina_unica.html", {"reserva": horario})
