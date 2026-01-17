@@ -5,26 +5,6 @@ from .models import Cliente, Agendamento
 from django.urls import reverse
 from datetime import datetime
 
-# Create your views here.
-# json
-# def index(request):
-#     lista_clientes = Cliente.objects.order_by("-data_cadastro")
-#     saida = ", ".join(
-#         [f"{cliente.nome} {cliente.sobrenome}" for cliente in lista_clientes]
-#     )
-#     saida_itens = []
-#     for cliente in lista_clientes:
-#         objecto = {
-#             "nome": cliente.nome,
-#             "sobrenome": cliente.sobrenome,
-#             "email": cliente.email,
-#             "cep": cliente.endereco.cep if cliente.endereco else None,
-#             "cidade": cliente.endereco.cidade if cliente.endereco else None,
-#         }
-#         saida_itens.append(objecto)
-#     return JsonResponse(saida_itens, safe=False)
-
-
 def index(request):
     lista_clientes = Cliente.objects.order_by("-data_cadastro")
     list = [
@@ -63,11 +43,16 @@ def vote(request, cliente_id):
     return HttpResponse(message)
 
 
-def agenda(request):
+def pag_agenda(request):
     agenda = Agendamento.objects.filter(data=datetime.now()).order_by("horario_inicio")
     return render(request, "agendamento/agenda.html", {"agenda": agenda})
 
 
-def reserva(request, agendamento_id):
+def pag_disponibilidade(request):
+    agenda = Agendamento.objects.filter(data=datetime.now()).order_by("horario_inicio")
+    return render(request, "agendamento/agenda.html", {"agenda": agenda})
+
+
+def pag_unica(request, agendamento_id):
     horario = get_object_or_404(Agendamento, pk=agendamento_id)
     return render(request, "agendamento/pagina_unica.html", {"reserva": horario})

@@ -15,9 +15,8 @@
       <div class="header">
         <a href="/" class="header_title">Nail Designer</a>
         <nav class="header_links">
-          <a href="">Sobre</a>,
-          <a href="">Posts</a>
-          <a href="">Login</a>
+          <a href="{% url 'sobre' %}">Sobre</a>,
+          <a href="{% url 'agendamento:index' %}">Agendamentos</a>
         </nav>
       </div>
     </header>

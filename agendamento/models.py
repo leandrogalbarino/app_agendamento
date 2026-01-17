@@ -1,4 +1,6 @@
 from django.db import models
+from datetime import datetime, date, time, timedelta
+from django.core.exceptions import ValidationError
 
 
 # Create your models here.
@@ -48,6 +50,51 @@ class Agendamento(models.Model):
     bloqueado = models.BooleanField(default=False)
     descricao = models.CharField(max_length=100, blank=True)
 
+    def _verificar_conflitos_horarios(self):
+        data = self.data
+        margem = timedelta(minutes=15)
+
+        novo_agendamento_inicio = datetime.combine(data, self.horario_inicio)
+        novo_agendamento_fim = datetime.combine(data, self.horario_fim)
+        conflitos = Agendamento.objects.filter(data=self.data).exclude(pk=self.pk)
+
+        for item in conflitos:
+            inicio_com_descanso = datetime.combine(data, item.horario_inicio) - margem
+            fim_com_descanso = datetime.combine(data, item.horario_fim) + margem
+
+            if (
+                novo_agendamento_inicio < fim_com_descanso
+                and novo_agendamento_fim > inicio_com_descanso
+            ):
+                raise ValidationError(
+                    "Houve conflito de horários, por favor, verifique os horários disponiveis."
+                )
+
+    def _validar_intervalo_horario(self):
+        self_inicio = datetime.combine(self.data, self.horario_inicio)
+        self_fim = datetime.combine(self.data, self.horario_fim)
+        if self_inicio >= self_fim:
+            raise ValidationError(
+                "O horário de fim precisa ser posteriormente ao de início."
+            )
+
+    def _inicializar_valor_pago(self):
+        if self.valor_pago is None:
+            if not self.bloqueado and self.procedimento:
+                self.valor_pago = self.procedimento.valor
+            else:
+                self.valor_pago = 0.0
+
+    def clean(self):
+        super().clean()
+        self._validar_intervalo_horario()
+        self._verificar_conflitos_horarios()
+
+    def save(self, *args, **kwargs):
+        if not self.pk:
+            self._inicializar_valor_pago()
+        super().save(*args, **kwargs)
+
     def __str__(self):
         if self.bloqueado:
             informacao_bloqueo = (
@@ -58,9 +105,7 @@ class Agendamento(models.Model):
         nome_procedimento = (
             self.procedimento.nome if self.procedimento else "Não definido"
         )
-        return (
-            f"{self.data} | {self.horario_inicio}-{self.horario_fim}: {nome_cliente} - {nome_procedimento}"
-        )
+        return f"{self.data} | {self.horario_inicio} - {self.horario_fim}: {nome_cliente} - {nome_procedimento}"
 
 
 class Procedimento(models.Model):

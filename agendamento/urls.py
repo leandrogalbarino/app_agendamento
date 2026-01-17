@@ -4,7 +4,7 @@ from . import views
 app_name = "agendamento"
 
 urlpatterns = [
-    # path("", views.index, name="index"),
-    path("", views.agenda, name="index"),
-    path("<int:agendamento_id>/", views.reserva, name="pagina_unica")
+    path("", views.pag_agenda, name="index"),
+    path("disponiveis/", views.pag_disponibilidade, name="pagina_disponibilidade"),
+    path("<int:agendamento_id>/", views.pag_unica, name="pagina_unica"),
 ]
