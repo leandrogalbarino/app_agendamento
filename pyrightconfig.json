@@ -1,0 +1,5 @@
+{
+  "djangoSettingsModule": "nail_designer.settings",
+  "venvPath": "..",
+  "venv": ".venv"
+}

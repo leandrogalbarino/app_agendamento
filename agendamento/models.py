@@ -50,6 +50,9 @@ class Agendamento(models.Model):
     bloqueado = models.BooleanField(default=False)
     descricao = models.CharField(max_length=100, blank=True)
 
+    class Meta:
+        ordering = ["data"]
+
     def _verificar_conflitos_horarios(self):
         data = self.data
         margem = timedelta(minutes=15)

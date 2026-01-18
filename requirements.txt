@@ -1,3 +1,5 @@
 django
 pillow
 djangorestframework
+django-stubs
+djangorestframework-stubs
