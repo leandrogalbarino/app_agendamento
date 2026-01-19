@@ -54,7 +54,7 @@ class AgendamentoManager(models.Manager):
 class Agendamento(models.Model):
     relatorios = AgendamentoManager()
     objects = models.Manager()
-    
+
     data = models.DateField()
     horario_inicio = models.TimeField()
     horario_fim = models.TimeField()

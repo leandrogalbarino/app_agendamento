@@ -41,7 +41,16 @@ class AgendamentosListOrAdd(APIView):
     """
 
     def get(self, request):
-        agendamentos = Agendamento.objects.filter(data=datetime.today().date())
+        filtros = request.query_params
+
+        if "todos" in filtros and filtros["todos"]:
+            agendamentos = Agendamento.objects.all()
+        elif "data" in filtros:
+            data = converter_data(filtros["data"])
+            agendamentos = Agendamento.objects.filter(data=data)
+        else:
+            agendamentos = Agendamento.objects.filter(data=datetime.today().date())
+
         serializer = AgendamentoSerializer(agendamentos, many=True)
         return Response(serializer.data)
 
