@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Agendamento, Cliente, Endereco
+from .models import Agendamento, Cliente, Endereco, Procedimento
 from datetime import datetime, timedelta
 from django.db.models import Q
 
@@ -31,7 +31,7 @@ class ClienteSerializer(serializers.ModelSerializer):
 
 class AgendamentoSerializer(serializers.ModelSerializer):
     cliente_info = ClienteSerializer(source="cliente", read_only=True)
-    procedimento = serializers.ReadOnlyField(source="procedimento.nome")
+    procedimento_nome = serializers.ReadOnlyField(source="procedimento.nome")
 
     class Meta:
         model = Agendamento
@@ -43,6 +43,7 @@ class AgendamentoSerializer(serializers.ModelSerializer):
             "cliente",
             "cliente_info",
             "procedimento",
+            "procedimento_nome",
             "valor_pago",
             "bloqueado",
             "descricao",

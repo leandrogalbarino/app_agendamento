@@ -1,16 +1,23 @@
 from django.http import JsonResponse, HttpResponse
 from rest_framework.parsers import JSONParser
-from django.template import loader
 from django.shortcuts import render, get_object_or_404
 
 from datetime import datetime
 
 
-from django.http import JsonResponse, HttpRequest
+from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.parsers import JSONParser
 from .models import Cliente, Agendamento
 from .serializers import AgendamentoSerializer
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+from rest_framework.decorators import api_view
+from django.shortcuts import get_object_or_404
+
+# Utilitarios do arquivo utils
+from .utils import converter_data, intervalo_mes, data_ja_ocorreu
 
 
 @csrf_exempt
@@ -28,18 +35,13 @@ def agendamento_lista(request):
     return HttpResponse(status=405)
 
 
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework import status
-
-
-class AgendamentoListaApi(APIView):
+class AgendamentosListOrAdd(APIView):
     """
-    Controle total: Listagem e Criação.
+    Ver todos agendamento para o Dia ou Criar um novo agendamento
     """
 
     def get(self, request):
-        agendamentos = Agendamento.objects.filter(data=datetime.now())
+        agendamentos = Agendamento.objects.filter(data=datetime.today().date())
         serializer = AgendamentoSerializer(agendamentos, many=True)
         return Response(serializer.data)
 
@@ -52,6 +54,82 @@ class AgendamentoListaApi(APIView):
             serializer.errors,
             status=status.HTTP_400_BAD_REQUEST,
         )
+
+
+class AgendamentoInfo(APIView):
+
+    def get(self, request, agendamento_id):
+        agendamento = get_object_or_404(Agendamento, pk=agendamento_id)
+        serializer = AgendamentoSerializer(agendamento)
+        return Response(serializer.data)
+
+    def patch(self, request, agendamento_id):
+        agendamento = get_object_or_404(Agendamento, pk=agendamento_id)
+        serializer = AgendamentoSerializer(agendamento, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request, agendamento_id):
+        agendamento = get_object_or_404(Agendamento, pk=agendamento_id)
+        nome_cliente = agendamento.cliente.nome if agendamento.cliente else None
+        agendamento.delete()
+
+        if nome_cliente:
+            mensagem = f"O agendamento com id: {agendamento_id} do cliente {nome_cliente} foi removido com sucesso."
+        else:
+            mensagem = (
+                f"O agendamento com id: {agendamento_id} foi removido com sucesso."
+            )
+
+        return Response(
+            {"mensagem": mensagem},
+            status=status.HTTP_204_NO_CONTENT,
+        )
+
+
+@api_view(["GET"])
+def api_docs(request):
+    endpoints = {
+        "raiz": "/agendamento/api/raiz",
+        "moderno": "/agendamento/api/moderno",
+        "faturamento": "/agendamento/api/faturamento_mensal",
+        "dia": "/agendamento/api/agendamentos_dia",
+    }
+    return Response({"documentacao": endpoints}, status=status.HTTP_200_OK)
+
+
+@api_view(["GET"])
+def faturamento_mensal(request):
+
+    filtros = request.query_params
+
+    data_atual = datetime.today().date()
+    mes_inicio, mes_fim = intervalo_mes(data_atual)
+
+    if "data" in filtros:
+        data_str = filtros.get("data")
+        data = converter_data(data_str)
+        if data_ja_ocorreu(data):
+            mes_inicio, mes_fim = (
+                intervalo_mes(data, todo_mes=True)
+                if "mes_total" in filtros
+                else intervalo_mes(data)
+            )
+        else:
+            return Response(
+                {
+                    "erro": "Esta data ainda não ocorreu. por favor insira uma data válida para calculo do Faturamento."
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+    metricas = Agendamento.relatorios.obter_metricas_mensal(
+        mes_inicio=mes_inicio, mes_fim=mes_fim
+    )
+
+    return Response(metricas, status=status.HTTP_200_OK)
 
 
 def index(request):

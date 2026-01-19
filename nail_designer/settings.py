@@ -42,6 +42,11 @@ INSTALLED_APPS = [
     "agendamento",
 ]
 
+REST_FRAMEWORK = {
+    # Garante que erros de validação usem a chave 'erro' ou 'detail' traduzidos
+    "NON_FIELD_ERRORS_KEY": "erro",
+}
+
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
@@ -140,6 +145,9 @@ LANGUAGE_CODE = "pt-br"
 TIME_ZONE = "America/Sao_Paulo"
 
 USE_I18N = True
+
+# 4. Ativa a formatação de números e datas localizados
+USE_L10N = True
 
 USE_TZ = True
 

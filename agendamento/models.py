@@ -1,6 +1,8 @@
 from django.db import models
 from datetime import datetime, date, time, timedelta
 from django.core.exceptions import ValidationError
+from django.db.models import Sum, Avg, Count, Value, DecimalField
+from django.db.models.functions import Coalesce, Round
 
 
 # Create your models here.
@@ -34,7 +36,25 @@ class Endereco(models.Model):
         return f"Cep: {self.cep} | Num: {self.numero} "
 
 
+class AgendamentoManager(models.Manager):
+    def obter_metricas_mensal(self, mes_inicio, mes_fim):
+        metricas = self.filter(data__range=(mes_inicio, mes_fim)).aggregate(
+            total_recebido=Round(
+                Coalesce(Sum("valor_pago"), Value(0.00), output_field=DecimalField()), 2
+            ),
+            media_por_servico=Round(
+                Coalesce(Avg("valor_pago"), Value(0.00), output_field=DecimalField()), 2
+            ),
+            total_atendimentos=Count("id"),
+        )
+        metricas["periodo"] = f"{mes_inicio} até {mes_fim}"
+        return metricas
+
+
 class Agendamento(models.Model):
+    relatorios = AgendamentoManager()
+    objects = models.Manager()
+    
     data = models.DateField()
     horario_inicio = models.TimeField()
     horario_fim = models.TimeField()
@@ -45,7 +65,7 @@ class Agendamento(models.Model):
         "Procedimento", on_delete=models.SET_NULL, null=True, blank=True
     )
     valor_pago = models.DecimalField(
-        max_digits=6, decimal_places=2, null=True, blank=True
+        max_digits=6, decimal_places=2, null=True, blank=True, default=0.00
     )
     bloqueado = models.BooleanField(default=False)
     descricao = models.CharField(max_length=100, blank=True)
