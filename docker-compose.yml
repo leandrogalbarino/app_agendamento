@@ -1,0 +1,12 @@
+services:
+  web:
+    build: .
+    image: leandrogalbarino/app_agendamento:1.0
+    command: python src/manage.py runserver 0.0.0.0:8000
+    volumes:
+      - .:/app
+      - sqlite_data:/app/db_data/
+    ports:
+      - "8000:8000"
+volumes:
+  sqlite_data
